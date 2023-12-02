@@ -15,9 +15,9 @@
 const fs = require('fs');
 const letterRegex = /[a-z]| */gi;
 const gamePieces = {
-  red: 12,
-  green: 13,
-  blue: 14
+  red: 0,
+  green: 0,
+  blue: 0
 }
 
 fs.readFile('./input.txt', 'utf-8', gameCalculator)
@@ -29,11 +29,15 @@ function gameCalculator(err, games) {
   
   const gameKeys = Object.keys(seperated);
 
-  const validGameIDs = gameKeys.map(key => checkValidGame(seperated, key));
+  const requiredGamePieces = gameKeys.map(key => checkValidGame(seperated, key));
 
-  const validScore = validGameIDs.reduce((a, b) => { return a + b }, 0);
+  // const validScore = validGameIDs.reduce((a, b) => { return a + b }, 0);
 
-  console.log({ validScore });
+  console.log({ requiredGamePieces, length: requiredGamePieces.length });
+
+  const powers = calculatePowers(requiredGamePieces);
+
+  console.log(powers.reduce((a, b) => { return a + b }, 0));
 }
 
 function seperateGames(games) {
@@ -46,6 +50,10 @@ function seperateGames(games) {
 function checkValidGame(gamesList, gameID) {
   const currentGame = gamesList[gameID];
 
+  gamePieces.red = 0;
+  gamePieces.green = 0;
+  gamePieces.blue = 0;
+
   let validGame = true;
   const validity = [];
 
@@ -53,23 +61,25 @@ function checkValidGame(gamesList, gameID) {
     switch(true) {
       case check.includes('red'):
         let redBalls = parseInt(check.replace(letterRegex, ''));
-        validGame = redBalls <= gamePieces.red;
+        if (gamePieces.red < redBalls) gamePieces.red = redBalls;
         // console.log(redBalls <= gamePieces.red);
-        validity.push(validGame ? 0 : 1);
+        // validity.push(validGame ? 0 : 1);
         break;
       case check.includes('green'):
         greenBalls = parseInt(check.replace(letterRegex, ''));
-        validGame = greenBalls <= gamePieces.green;
-        validity.push(validGame ? 0 : 1);
+        // validGame = greenBalls <= gamePieces.green;
+        // validity.push(validGame ? 0 : 1);
+        if (gamePieces.green < greenBalls) gamePieces.green = greenBalls;
         // console.log(validGame);
-        if(!validGame) return 0;
+        // if(!validGame) return 0;
         break;
       case check.includes('blue'):
         const blueBalls = parseInt(check.replace(letterRegex, ''));
-        validGame = blueBalls <= gamePieces.blue;
-        validity.push(validGame ? 0 : 1);
+        // validGame = blueBalls <= gamePieces.blue;
+        // validity.push(validGame ? 0 : 1);
+        if (gamePieces.blue < blueBalls) gamePieces.blue = blueBalls;
         // console.log(blueBalls <= gamePieces.blue);
-        if(!validGame) return 0;
+        // if(!validGame) return 0;
         break;
       default:
         return 0;
@@ -78,8 +88,17 @@ function checkValidGame(gamesList, gameID) {
   // console.log({validGame, validity});
 
   // only games who have no penalties applied are actually valid
-  validGame = validity.reduce((a, b) => { return a + b }, 0) === 0;
+  // validGame = validity.reduce((a, b) => { return a + b }, 0) === 0;
 
   // console.log(currentGame);
-  return validGame ? parseInt(gameID) : 0;
+  // return validGame ? parseInt(gameID) : 0;
+  return { ... gamePieces };
+}
+
+function calculatePowers(game) {
+  const powers = game.map(pieces => {
+    return pieces.red * pieces.green * pieces.blue;
+  });
+
+  return powers;
 }
