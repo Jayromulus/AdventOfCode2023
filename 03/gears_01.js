@@ -2,7 +2,7 @@ const fs = require('fs');
 const characterRegex = /[-!$%^&*()_+|~=`{}\[\]:";'<>?,\/\\#@]/
 
 fs.readFile('./input.txt', 'utf-8', (err, data) => {
-	if (err) throw err;
+  if (err) throw err;
 
   const lines = data.split(`\r\n`);
   // console.log('line 1, char 28:', lines[0][28]);
