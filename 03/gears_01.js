@@ -4,11 +4,10 @@ const characterRegex = /[-!$%^&*()_+|~=`{}\[\]:";'<>?,\/\\#@]/
 fs.readFile('./input.txt', 'utf-8', (err, data) => {
 	if (err) throw err;
 
-  
-	const lines = data.split(`\r\n`);
+  const lines = data.split(`\r\n`);
   // console.log('line 1, char 28:', lines[0][28]);
   // console.log('line 2, char 28:', lines[1][28]);
-	const schematic = lines.map(line => line.split(''));
+  const schematic = lines.map(line => line.split(''));
   const validGears = [];
   const validGearIndexes = [];
 
