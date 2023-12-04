@@ -44,13 +44,13 @@ fs.readFile('./input.txt', 'utf-8', (err, data) => {
     });
   });
 
-	console.log({validGears});
+  console.log({validGears});
   // console.log({row1: validGearIndexes.filter(str => str.includes('x: 3,'))})
   console.log(validGears.reduce((a, b) => a + b, 0))
 });
 
 function checkBoundary(num, limit) {
-	return num < limit && num > 0 ? num : 0
+  return num < limit && num > 0 ? num : 0
 };
 
 function findFullNumber(schematic, x, y, validIndexes, validGears, lines) {
