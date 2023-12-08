@@ -9,10 +9,11 @@ fs.readFile('./input.txt', 'utf-8', (err, data) => {
   const validGears = [];
   const validGearIndexes = [];
 
+  // console.log(schematic[0]);
+
   schematic.forEach((schematicLine, yIndex) => {
     schematicLine.forEach((character, xIndex) => {
       let validGear = false;
-      // console.log('boundary:',checkBoundary(xIndex, schematicLine.length))
 
       let topLeft;
       let topMiddle;
@@ -22,23 +23,23 @@ fs.readFile('./input.txt', 'utf-8', (err, data) => {
       let bottomLeft;
       let bottomMiddle;
       let bottomRight;
-        
+
       if (yIndex !== 0) {
         topLeft = schematic[checkBoundary(yIndex - 1, schematicLine.length)][checkBoundary(xIndex - 1, schematicLine.length)];
         topMiddle = schematic[checkBoundary(yIndex - 1, schematicLine.length)][checkBoundary(xIndex, schematicLine.length)];
         topRight = schematic[checkBoundary(yIndex - 1, schematicLine.length)][checkBoundary(xIndex + 1, schematicLine.length)];
       }
 
-      left = schematic[checkBoundary(yIndex, schematicLine.length)][checkBoundary(xIndex - 1, schematicLine.length)];
-      right = schematic[checkBoundary(yIndex, schematicLine.length)][checkBoundary(xIndex + 1, schematicLine.length)];
+      left = schematicLine[checkBoundary(xIndex - 1, schematicLine.length)];
+      right = schematicLine[checkBoundary(xIndex + 1, schematicLine.length)];
 
       if (yIndex !== schematic.length - 1) {
         bottomLeft = schematic[checkBoundary(yIndex + 1, schematicLine.length)][checkBoundary(xIndex - 1, schematicLine.length)];
         bottomMiddle = schematic[checkBoundary(yIndex + 1, schematicLine.length)][checkBoundary(xIndex, schematicLine.length)];
         bottomRight = schematic[checkBoundary(yIndex + 1, schematicLine.length)][checkBoundary(xIndex + 1, schematicLine.length)];
       }
-      
-      // if(yIndex === 0) { // log can be between lines 0 and 139
+
+      // if(yIndex === 3) { // log can be between lines 0 and 139
       //   console.log({
       //     topLeft,
       //     topMiddle,
@@ -50,28 +51,35 @@ fs.readFile('./input.txt', 'utf-8', (err, data) => {
       //     bottomRight
       //   });
       // }
-        
-      if (characterRegex.test(topLeft)) validGear = true;
-      if (characterRegex.test(topMiddle)) validGear = true;
-      if (characterRegex.test(topRight)) validGear = true;
-      if (characterRegex.test(left)) validGear = true;
-      if (characterRegex.test(right)) validGear = true;
-      if (characterRegex.test(bottomLeft)) validGear = true;
-      if (characterRegex.test(bottomMiddle)) validGear = true;
-      if (characterRegex.test(bottomRight)) validGear = true;
 
-      if (validGear) findFullNumber(schematic, xIndex, yIndex, validGearIndexes, validGears, lines);
+      if (
+        characterRegex.test(topLeft) ||
+        characterRegex.test(topMiddle) ||
+        characterRegex.test(topRight) ||
+        characterRegex.test(left) ||
+        characterRegex.test(right) ||
+        characterRegex.test(bottomLeft) ||
+        characterRegex.test(bottomMiddle) ||
+        characterRegex.test(bottomRight)
+      ) validGear = true;
+
+      validGear && findFullNumber(schematic, xIndex, yIndex, validGearIndexes, validGears, lines);
     });
   });
 
-  // console.log({validGears}); // all valid gears
-  console.log(validGears.reduce((a, b) => a + b, 0))
+  const total = validGears.reduce((a, b) => a + b, 0);
 
-  const uniqueValues = validGears.every((value, index, gears) => {
-    return gears.indexOf(value) === gears.lastIndexOf(value)
+  // console.log({ validGears })
+  console.log({ total })
+
+  // const uniqueValues = validGears.every((value, index, gears) => {
+  //   return gears.indexOf(value) === gears.lastIndexOf(value)
+  // })
+  // console.log({uniqueValues});
+  
+  fs.writeFile('output.txt', validGearIndexes.join('\n'), (err) => {
+    if (err) throw err;
   })
-
-  console.log({uniqueValues});
 });
 
 function checkBoundary(num, limit) {
@@ -86,7 +94,8 @@ function findFullNumber(schematic, x, y, validIndexes, validGears, lines) {
   let endingIndex = -1;
 
   while (initialIndex === -1) {
-    if (numCheck.test(schematic[y][initialSeed-1])) {
+    if (numCheck.test(schematic[y][initialSeed - 1])) {
+      // console.log(numCheck.test(schematic[y][initialSeed]));
       initialSeed--;
     } else {
       initialIndex = initialSeed;
@@ -102,16 +111,20 @@ function findFullNumber(schematic, x, y, validIndexes, validGears, lines) {
       break;
     }
   }
+  
 
   const number = lines[y].substring(initialIndex, endingIndex);
+
+  // console.log(number);
   const indexString = `y: ${y}, init: ${initialIndex}, end: ${endingIndex}, num: ${number}`;
 
-  if (numCheck.test(number) && !validGears.includes(parseInt(number))) {
+  // if (numCheck.test(number) && !validGearsincludes(parseInt(number))) {
+  if (numCheck.test(number) && !validIndexes.includes(indexString)) {
+    // console.log(parseInt(number));
+    validIndexes.push(indexString)
     validGears.push(parseInt(number));
   }
 
   //! 559957 too high
   //! 340755 too low
-
-  // console.log({initialIndex, endingIndex});
 }
