@@ -13,7 +13,7 @@ fs.readFile('./input.txt', 'utf-8', (err, data) => {
 
     line.map((inner, i) => {
       if(i === 0)
-        cardBlock.number = inner.split(' ').filter(n => n !== '').splice(1)
+        cardBlock.number = parseInt(inner.split(' ').filter(n => n !== '')[1])
       else if(i === 1)
         cardBlock.references = inner.split(' ').filter(n => n !== '')
       else
@@ -22,20 +22,29 @@ fs.readFile('./input.txt', 'utf-8', (err, data) => {
 
       cardList.push(cardBlock);
     })
-    console.log({test: cardList[100]});
 
-  let scoreList = cardList.map(card => {
-    let score = 0
+  for (card of cardList) {
+    card.score = 0
 
     card.references.forEach(num => {
-      if (card.checkers.includes(num))
-        score > 0 ? score *= 2 : score++;
+      if (card.checkers.includes(num)) {
+        // if (card.number === 101) console.log('score');
+        card.score++;
+      }
     })
 
-    return score;
-  })
+    for (;card.score > 0; card.score--) {
+      const newCard = {...cardList.find(val => val.number === card.number + card.score)}
+      // console.log({newCard})
+      cardList.push(newCard);
+    }
 
-  console.log(scoreList.reduce((a, b) => a + b, 0))
+    // return score;
+  }
+
+  console.log({'# of cards': cardList.length});
+
+  // console.log(scoreList.reduce((a, b) => a + b, 0))
 });
 
 // better way to do this would be to score card in place and create a buffer to keep track of how many copies of a given card I need as I get to that card
