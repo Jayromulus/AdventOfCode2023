@@ -9,10 +9,12 @@ fs.readFile('./input.txt', 'utf-8', (err, data) => {
   const schematic = lines.map(line => line.split(''));
   const validGears = [];
   const validGearIndexes = [];
+  const ratioMarkerIndexes = [];
 
   schematic.forEach((schematicLine, yIndex) => {
     schematicLine.forEach((character, xIndex) => {
       let validGear = false;
+      let ratioMarker = false;
 
       let topLeft;
       let topMiddle;
@@ -38,6 +40,9 @@ fs.readFile('./input.txt', 'utf-8', (err, data) => {
         bottomRight = schematic[checkBoundary(yIndex + 1, schematicLine.length)][checkBoundary(xIndex + 1, schematicLine.length)];
       }
 
+      // if one of these is a symbol and specifically an asterisk, note the position and checkfor numbers which may index between the locations this might be
+      //  this should be stored in a seperate array, and then loop over the seperate array checking if the x y exists between/adjacent to the postion of a valid gear before taking those valid gears, adding their product to a validRatios array, and then summing that
+
       if (
         digitRegex.test(schematic[yIndex][xIndex]) && (
         characterRegex.test(topLeft) ||
@@ -50,13 +55,18 @@ fs.readFile('./input.txt', 'utf-8', (err, data) => {
         characterRegex.test(bottomRight))
       ) validGear = true;
 
+      if(schematic[yIndex][xIndex] === '*') ratioMarker = true;
+
       validGear && findFullNumber(schematic, xIndex, yIndex, validGearIndexes, validGears, lines);
+      ratioMarker && ratioMarkerIndexes.push(`${yIndex}, ${xIndex}`);
     });
   });
   
-  console.log({ validGears })
+  // console.log({ validGears })
   const total = validGears.reduce((a, b) => a + b, 0);
 
+  console.log({ratioMarkerIndexes});
+  // maybe loop over array, mark each item with which ratio markers are near it, then check if a marker has multiple gears?
   console.log({ total })
 
   fs.writeFile('output.txt', validGearIndexes.join('\n'), (err) => {
